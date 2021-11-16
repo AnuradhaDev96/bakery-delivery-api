@@ -1,7 +1,7 @@
 {
   "name": "bakery-delivery-api",
   "version": "1.0.0",
-  "description": "Rest API for bakery delivery client aplications.",
+  "description": "Node js server side application for bakery delivery application",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,10 +11,10 @@
     "url": "git+https://github.com/AnuradhaDev96/bakery-delivery-api.git"
   },
   "keywords": [
-    "node",
-    "bakery-api",
-    "rest",
-    "firebase"
+    "nodejs",
+    "firebase",
+    "postgresql",
+    "backend"
   ],
   "author": "Anuradha Hewa Siribaddana",
   "license": "ISC",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/AnuradhaDev96/bakery-delivery-api#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "firebase-admin": "^10.0.0"
   }
 }
