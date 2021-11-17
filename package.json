@@ -24,6 +24,7 @@
   "homepage": "https://github.com/AnuradhaDev96/bakery-delivery-api#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "firebase": "^9.4.1",
     "firebase-admin": "^10.0.0"
   }
 }

@@ -1,33 +1,105 @@
-// const firestoreDb = require('../../firestoreConfig');
+const { firestore } = require('../../configuration/firebaseClientConfig');
+const { collection, addDoc, getDocs, doc, getDoc } = require('firebase/firestore/lite');
 
-const addProduct = async (req, res, next) => {
-    // const admin = require("firebase-admin");
-    // const serviceAccount = require('../../serviceAccount/serviceAccount.json');
-    // firebaseApp = admin.initializeApp({
-    //     credential: admin.credential.cert(serviceAccount)
-    // });
-    // const { getFirestore } = require('firebase-admin/firestore');
-    // const db = getFirestore(firebaseApp);
+const getAllProducts = async (req, res, next) => {
     try {
-        const product = {
-            name: req.body.name,
-            type: req.body.type
-        };
-        // await db.collection('Products').doc().set(product);
-        // await firestoreDb.collection('Products').doc().set(product);
-        res.status(201).json({
-            message: 'Handling POST requests to /products',
-            product: product
+        await getDocs(collection(firestore, "Products")).then((querySnapshot) => {
+            // querySnapshot.forEach((snapshot) => {
+            //     console.log(snapshot.id);
+            // });
+            const result = querySnapshot.docs.map((doc) => {
+                // doc.data()
+                return { id: doc.id, ...doc.data() };
+            });
+            res.status(200).json({
+                data: result
+            });
         });
     } catch (error) {
-        // db.collection("Products").a
-        res.status(201).json({
-            message: 'Handling POST requests to /products',
-            product: product
+        res.status(401).json({
+            message: "No products available"
+        });
+    }
+};
+
+const addProduct = async (req, res, next) => {
+    const productData = {
+        brand: req.body.brand,
+        type: req.body.type,
+        createdBy: req.userData.uid,
+        createdOn: serverTimestamp()
+    };
+    try {
+        await addDoc(collection(firestore, "Products"), productData).then((savedItem) => {
+            const productId = savedItem.id;
+            res.status(201).json({
+                message: 'Product saved successfully',
+                productId: productId
+                // userData: req.userData
+            });
+        });
+    } catch (error) {
+        res.status(400).json({
+            message: error,
+        });
+    }
+};
+
+const getProductById = async (req, res, next) => {
+    const id = req.params.productId;
+    try {
+        await getDoc(doc(firestore, "Products", id)).then((snapshot) => {
+            const result = { id: snapshot.id, ...snapshot.data() };
+            res.status(200).json({
+                data: result
+            });
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(404).json({
+            message: 'Product does not exist',
+        });
+    }
+};
+
+const updateProduct = async (req, res, next) => {
+    const id = req.params.productId;
+    // const upTime = Timestamp.fromDate(new Date()).toDate();
+    try {
+        await updateDoc(doc(firestore, "Products", id), {
+            brand: req.body.brand,
+            type: req.body.type
+        });
+        res.status(204).json({
+            message: 'Product updated successfully'
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(404).json({
+            message: 'Product does not exist',
+        });
+    }
+
+};
+
+const deleteProduct = async (req, res, next) => {
+    const id = req.params.productId;
+    try {
+        await deleteDoc(doc(firestore, "Products", id));
+        res.status(204).json({
+            message: 'Product Deleted'
+        });
+    } catch (error) {
+        res.status(404).json({
+            message: 'Product does not exist'
         });
     }
 };
 
 module.exports = {
-    addProduct
+    getAllProducts,
+    addProduct,
+    getProductById,
+    updateProduct,
+    deleteProduct
 };

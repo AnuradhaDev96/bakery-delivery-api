@@ -4,6 +4,7 @@ const app = express();
 
 //import routes
 const productRoutes = require('./api/routes/products');
+const userRoutes = require('./api/routes/bakeryUser');
 
 //other plugins integrations
 app.use(express.urlencoded({extended: true}));
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 
 //sub routes
 app.use('/products', productRoutes);
+app.use('/auth', userRoutes);
 
 app.use((req, res, next) => {
     const error = new Error('Not Found');
