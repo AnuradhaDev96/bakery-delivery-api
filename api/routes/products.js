@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 // const { productsRef } = require('../../firestoreConfig');
-const { firestore } = require('../../configuration/firebaseClientConfig');
 const checkAuth = require('../middleware/checkAuth');
 const ProductController = require('../controller/productController');
 

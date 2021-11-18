@@ -1,5 +1,5 @@
 const { firestore } = require('../../configuration/firebaseClientConfig');
-const { collection, addDoc, getDocs, doc, getDoc } = require('firebase/firestore/lite');
+const { collection, addDoc, getDocs, doc, getDoc, serverTimestamp } = require('firebase/firestore/lite');
 
 const getAllProducts = async (req, res, next) => {
     try {
