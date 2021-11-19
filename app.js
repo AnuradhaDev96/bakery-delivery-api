@@ -8,6 +8,7 @@ const userRoutes = require('./api/routes/bakeryUser');
 const vehicleRoutes = require('./api/routes/deliveryVehicle');
 const foodItemRoutes = require('./api/routes/foodItem');
 const instantOrderRoutes = require('./api/routes/instantOrder');
+const shoppingCartRoutes = require('./api/routes/shoppingCart');
 
 //other plugins integrations
 app.use(express.urlencoded({extended: true}));
@@ -35,6 +36,7 @@ app.use('/auth', userRoutes);
 app.use('/vehicle', vehicleRoutes);
 app.use('/fooditem', foodItemRoutes);
 app.use('/instantorder', instantOrderRoutes);
+app.use('/shoppingcart', shoppingCartRoutes);
 
 app.use((req, res, next) => {
     const error = new Error('Not Found');

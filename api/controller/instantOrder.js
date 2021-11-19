@@ -1,8 +1,13 @@
 //Methods for Instant Order are implemented here
 //TO-DO: Implement set current location of the user as delivery location.
+//TO:DO: Sort out the orders for the driver by the closest distance
+//TO:DO: Save the users current location and driver listen to them while driving and receive notfications
+//TO:DO: prefered drivers - make pre orders.
+
+//FUTURE WORK: preorder feaure with saved routes of drivers and list them to customer
 
 const { firestore } = require('../../configuration/firebaseClientConfig');
-const { collection, addDoc, getDocs, doc, getDoc, serverTimestamp, runTransaction, query, GeoPoint } = require('firebase/firestore/lite');
+const { collection, addDoc, getDocs, doc, getDoc, serverTimestamp, runTransaction, query, GeoPoint, updateDoc } = require('firebase/firestore/lite');
 
 const addOrder = async (req, res, next) => {
     // calculate(sd);
@@ -22,7 +27,9 @@ const addOrder = async (req, res, next) => {
             deliveryLocation: new GeoPoint(req.body.deliveryLocation.latitude, req.body.deliveryLocation.longitude),
             orderStatus: "PENDING",
             createdBy: req.userData.uid,
-            createdOn: serverTimestamp()
+            createdOn: serverTimestamp(),
+            updatedBy: req.userData.uid,
+            updatedOn: serverTimestamp()
         }
         const savedOrder = await addDoc(collection(firestore, "InstantOrders"), data);
         // console.log(savedOrder.id);
@@ -42,90 +49,62 @@ const addOrder = async (req, res, next) => {
     }
 };
 
-const initializeNewCartWithItem = async (req, res, next) => {
+const changeOrderStatusByRider = async (req, res, next) => {
+    const id = req.params.orderId;
+    const orderStatus = req.body.orderStatus;
+    // const upTime = Timestamp.fromDate(new Date()).toDate();
+    if (orderStatus === "PENDING") {
+        res.status(401).json({
+            message: 'Permission denied for the requested action'
+        });
+    }    
     try {
-        const data = {
-            vehicleId: req.body.vehicleId,
-            createdBy: req.userData.uid,
-            createdOn: serverTimestamp()
-        }
-        const savedItem = await addDoc(collection(firestore, "ShoppingCart"), data);
-        // const cartId = savedItem.id;
-        const itemData = {
-            foodId: req.body.foodId,
-            vehicleId: req.body.vehicleId,
-            quantity: req.body.quantity
-        }
-        const firestItem = await addDoc(collection(firestore, "ShoppingCart", savedItem.id, "CartItems"), itemData);
-        res.status(201).json({
-            shoppingCartId: savedItem.id,
-            firestItemId: firestItem.id
+        await updateDoc(doc(firestore, "InstantOrders", id), {
+            orderStatus: orderStatus,
+            updatedBy: req.userData.uid,
+            updatedOn: serverTimestamp()
+        });
+        res.status(204).json({
+            message: 'Order status change'
         });
     } catch (error) {
-        res.status(401).json({
-            message: 'Not found'
+        console.log(error);
+        res.status(404).json({
+            message: 'Order does not exist',
         });
     }
+
 };
 
-const saveItemInShoppingCart = async (req, res, next) => {
+const changeOrderStatusByCustomer = async (req, res, next) => {
+    const id = req.params.orderId;
+    const orderStatus = req.body.orderStatus;
+    // const upTime = Timestamp.fromDate(new Date()).toDate();
+    if (orderStatus === "ARRIVED") {
+        return res.status(401).json({
+            message: 'Permission denied for the requested action'
+        });
+    }    
     try {
-
-        itemDocRef = doc(firestore, "DeliveryVehicle", req.body.vehicleId, "FoodItems", req.body.foodId);
-        const itemDoc = await getDoc(itemDocRef);
-        const lotPrice = itemDoc.data().price * req.body.quantity;
-        // console.log(subTotal);
-
-        const itemData = {
-            foodId: req.body.foodId,
-            vehicleId: req.body.vehicleId,
-            quantity: req.body.quantity,
-            lotPrice: lotPrice
-        }
-        const savedItem = await addDoc(collection(firestore, "ShoppingCart", req.body.cartId, "CartItems"), itemData);
-        res.status(201).json({
-            shoppingCartId: req.body.cartId,
-            saveItemId: savedItem.id,
-            lotPrice: lotPrice
+        await updateDoc(doc(firestore, "InstantOrders", id), {
+            orderStatus: orderStatus,
+            updatedBy: req.userData.uid,
+            updatedOn: serverTimestamp()
+        });
+        res.status(204).json({
+            message: 'Order status change'
         });
     } catch (error) {
-        res.status(401).json({
-            message: 'Item does not exist'
+        console.log(error);
+        res.status(404).json({
+            message: 'Order does not exist',
         });
     }
-};
 
-const getCartItemsByCartId = async (req, res, next) => {
-    const cId = req.params.cartId;
-    try {
-        await getDocs(collection(firestore, "ShoppingCart", cId, "CartItems")).then((querySnapshot) => {
-            // querySnapshot.forEach((snapshot) => {
-            //     console.log(snapshot.id);
-            // });
-            let finalPrice = 0;
-
-            const result = querySnapshot.docs.map((doc) =>{
-                return { id: doc.id, ...doc.data() };
-            });
-            querySnapshot.docs.forEach((doc) => {
-                finalPrice += doc.data().lotPrice;
-            });
-            // const result = tot;
-            res.status(200).json({
-                finalPrice: finalPrice,
-                cartItems: result
-            });
-        });
-    } catch (error) {
-        res.status(401).json({
-            message: "No items available"
-        });
-    }
 };
 
 module.exports = {
     addOrder,
-    initializeNewCartWithItem,
-    saveItemInShoppingCart,
-    getCartItemsByCartId
+    changeOrderStatusByRider,
+    changeOrderStatusByCustomer
 }

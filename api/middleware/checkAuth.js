@@ -1,4 +1,5 @@
 const { auth } = require('../../firestoreConfig');
+//TO-DO: Implement check pivileges
 
 module.exports = async (req, res, next) => {
     try {
