@@ -1,6 +1,6 @@
 const { initializeApp } = require('firebase/app');
 const { getAuth, signInWithEmailAndPassword } = require('firebase/auth');
-const { getFirestore } = require('firebase/firestore/lite')
+const { getFirestore } = require('firebase/firestore/lite');
 
 const firebaseConfig = {
     apiKey: "AIzaSyBRNs-b3nklxihcIH4GEB_LNWT2e8Zw618",

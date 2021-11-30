@@ -26,6 +26,28 @@ const addDeliveryVehicle = async (req, res, next) => {
     }
 };
 
+const getAllDeliveryVehicles = async (req, res, next) => {
+    try {
+        await getDocs(collection(firestore, "DeliveryVehicle")).then((querySnapshot) => {
+            // querySnapshot.forEach((snapshot) => {
+            //     console.log(snapshot.id);
+            // });
+            const result = querySnapshot.docs.map((doc) => {
+                // doc.data()
+                return { id: doc.id, ...doc.data() };
+            });
+            res.status(200).json({
+                data: result
+            });
+        });
+    } catch (error) {
+        res.status(401).json({
+            message: "No vehicles available"
+        });
+    }
+};
+
 module.exports = {
-    addDeliveryVehicle
+    addDeliveryVehicle,
+    getAllDeliveryVehicles
 }

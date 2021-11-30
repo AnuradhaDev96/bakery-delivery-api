@@ -1,6 +1,7 @@
 const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
 const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
 const { getAuth } = require('firebase-admin/auth');
+const { getMessaging } = require('firebase-admin/messaging')
 const serviceAccount = require('./serviceAccount/serviceAccount.json');
 
 initializeApp({
@@ -10,6 +11,7 @@ initializeApp({
 
 const db = getFirestore();
 const auth = getAuth();
+const fcm = getMessaging();
 // const userI = auth.createUser()
 
 const productsRef = db.collection('Products');
@@ -18,5 +20,6 @@ const bakeryUserRef = db.collection('BakeryUser');
 module.exports = {
     productsRef,
     bakeryUserRef,
-    auth
+    auth,
+    fcm
 };
